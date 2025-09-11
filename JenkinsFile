@@ -88,7 +88,7 @@ pipeline {
         script{
             withCredentials([usernamePassword(credentialsId: 'nexus-creds',
             usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
-                sh 'mvn clean deploy -Dnexus.user=$NEXUS_USER -Dnexus.pass=$NEXUS_PASS'
+                sh 'mvn clean deploy -s settings.xml -Dnexus.user=$NEXUS_USER -Dnexus.pass=$NEXUS_PASS '
         }
         }
     }
