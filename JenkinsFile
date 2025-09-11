@@ -129,7 +129,7 @@ stage('Deploying image to docker container'){
     steps{
         script{
        
-            sh 'docker run -itd --name java-app -p 8000:8080 rajudonkeshwar/java1:${BUILD_NUMBER}'
+            sh 'docker run -itd --name java-app-1 -p 8000:8080 rajudonkeshwar/java1:${BUILD_NUMBER}'
         }
     }
 }
