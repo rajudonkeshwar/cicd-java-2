@@ -1,3 +1,5 @@
+
+<settings>
 <servers>
   <server>
     <id>nexus-releases</id>
@@ -10,3 +12,5 @@
     <password>raju@1997</password>
   </server>
 </servers>
+</settings>
+
