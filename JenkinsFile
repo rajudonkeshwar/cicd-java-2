@@ -5,7 +5,7 @@ pipeline {
     stage('Checkout Code') {
         steps {
             echo 'scm git'
-            git branch: 'main', url: 'https://github.com/rajudonkeshwar/devops-practice.git'
+            git branch: 'main', url: 'https://github.com/rajudonkeshwar/cicd-java-2.git'
         }
     }
     
@@ -14,7 +14,7 @@ pipeline {
       steps {
         sh 'ls -ltr'
         // build the project and create a JAR file
-        sh 'cd java-cicd-project/spring-boot-app && mvn compile && mvn test'
+        sh 'mvn compile && mvn test'
       }
     }
 
@@ -23,69 +23,89 @@ pipeline {
     steps {
         echo 'scanning project'
         sh 'ls -ltr'
-        sh '''cd java-cicd-project/spring-boot-app && mvn sonar:sonar \\
+        sh '''mvn sonar:sonar \\
               -Dsonar.host.url=http://localhost:9000 \\
-              -Dsonar.login=squ_d519f9f045bdd07c9fb4866a7614f18155c09308'''
+              -Dsonar.login=squ_5c91b17e48383048757232553c18df53661ca07e'''
     }
 }
 
 
 
 
-stage('Dependency Check') {
+    stage(' scaning of source code and its dependencies '){
+    steps{
+        sh "trivy fs ."
+    }
+}
+
+
+
+
+
+// stage('Dependency Check') {
     
-    steps {
-        sh '''
-          /opt/dependency-check/bin/dependency-check.sh \
-          --project "SpringBootApp" \
-          --scan java-cicd-project/spring-boot-app \
-          --format HTML \
-          --data $WORKSPACE/odc-data \
-          --out dependency-check-report
-        '''
-    }
-}
+//     steps {
+//         sh '''
+//           /opt/dependency-check/bin/dependency-check.sh \
+//           --project "SpringBootApp" \
+//           --scan java-cicd-project/spring-boot-app \
+//           --format HTML \
+//           --data $WORKSPACE/odc-data \
+//           --out dependency-check-report
+//         '''
+//     }
+// }
 
 
 
 
-    stage('Publish Report') {
-        steps {
-            publishHTML([
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'dependency-check-report',
-                reportFiles: 'dependency-check-report.html',
-                reportName: 'OWASP Dependency-Check Report'
-            ])
-        }
-    }
+//     stage('Publish Report') {
+//         steps {
+//             publishHTML([
+//                 allowMissing: false,
+//                 alwaysLinkToLastBuild: true,
+//                 keepAll: true,
+//                 reportDir: 'dependency-check-report',
+//                 reportFiles: 'dependency-check-report.html',
+//                 reportName: 'OWASP Dependency-Check Report'
+//             ])
+//         }
+//     }
 
 
     stage('Building the code') {
       steps {
         sh 'ls -ltr'
         // build the project and create a JAR file
-        sh 'cd java-cicd-project/spring-boot-app && mvn clean package'
+        sh 'mvn clean package'
       }
     }
 
 
+
+    stage('Deploy to Nexus') {
+    steps{
+        script{
+            withCredentials([string(credentialsId: 'nexus-creds', variable: 'nexus-creds')]) {
+            sh ' mvn deploy '
+            }
+        }
+    }
+}
 
 
     stage('Build docker image'){
     steps{
         script{
             echo 'docker image build'
-  sh 'cd java-cicd-project/spring-boot-app && docker build -t rajudonkeshwar/java:${BUILD_NUMBER} .'
+            sh ' docker build -t rajudonkeshwar/java1:${BUILD_NUMBER} .'
         }
     }
 }
 		
     stage('docker image scan'){
     steps{
-        sh "trivy image rajudonkeshwar/java:${BUILD_NUMBER}"
+        sh "trivy image rajudonkeshwar/java1:${BUILD_NUMBER}"
     }
 }		
 
@@ -97,7 +117,7 @@ stage('Push image to Hub'){
             sh 'docker login -u rajudonkeshwar -p ${dockerhub}'
 
       }
-            sh 'docker push rajudonkeshwar/java:${BUILD_NUMBER}'
+            sh "docker push rajudonkeshwar/java1:${BUILD_NUMBER}"
         }
     }
 }
@@ -107,7 +127,7 @@ stage('Deploying image to docker container'){
     steps{
         script{
        
-            sh 'docker run -itd --name java-app -p 8000:8080 rajudonkeshwar/java:${BUILD_NUMBER}'
+            sh 'docker run -itd --name java-app -p 8000:8080 rajudonkeshwar/java1:${BUILD_NUMBER}'
         }
     }
 }
