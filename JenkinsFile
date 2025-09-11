@@ -86,12 +86,14 @@ pipeline {
     stage('Deploy to Nexus') {
     steps{
         script{
-            withCredentials([string(credentialsId: 'nexus-creds', variable: 'nexus-creds')]) {
-            sh ' mvn deploy '
-            }
+            withCredentials([usernamePassword(credentialsId: 'nexus-creds',
+            usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                sh 'mvn clean deploy -Dnexus.user=$NEXUS_USER -Dnexus.pass=$NEXUS_PASS'
+        }
         }
     }
 }
+
 
 
     stage('Build docker image'){
