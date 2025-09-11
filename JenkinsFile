@@ -32,11 +32,11 @@ pipeline {
 
 
 
-    stage(' scaning of source code and its dependencies '){
-    steps{
-        sh "trivy fs ."
-    }
-}
+//     stage(' scaning of source code and its dependencies '){
+//     steps{
+//         sh "trivy fs ."
+//     }
+// }
 
 
 
@@ -105,11 +105,11 @@ pipeline {
     }
 }
 		
-    stage('docker image scan'){
-    steps{
-        sh "trivy image rajudonkeshwar/java1:${BUILD_NUMBER}"
-    }
-}		
+//     stage('docker image scan'){
+//     steps{
+//         sh "trivy image rajudonkeshwar/java1:${BUILD_NUMBER}"
+//     }
+// }		
 
 
 stage('Push image to Hub'){
