@@ -133,32 +133,32 @@ stage('Push image to Hub'){
 }
 
 
-stage('Deploying image to docker container'){
-    steps{
-        script{
+// stage('Deploying image to docker container'){
+//     steps{
+//         script{
 
 
-            def containerExists = sh(
-                script: 'docker ps -a --filter "name=java-app" --format "{{.Names}}"',
-                returnStdout: true
-            ).trim()
+//             def containerExists = sh(
+//                 script: 'docker ps -a --filter "name=java-app" --format "{{.Names}}"',
+//                 returnStdout: true
+//             ).trim()
 
-            if (containerExists) {
-                echo "Container exists: ${containerExists}"
-                 sh ' docker rm -f java-app '
-            } else {
-                echo "No container found with name java-app"
-                sh 'docker run -itd --name java-app -p 8000:8080 rajudonkeshwar/java1:${BUILD_NUMBER}'
+//             if (containerExists) {
+//                 echo "Container exists: ${containerExists}"
+//                  sh ' docker rm -f java-app '
+//             } else {
+//                 echo "No container found with name java-app"
+//                 sh 'docker run -itd --name java-app -p 8000:8080 rajudonkeshwar/java1:${BUILD_NUMBER}'
 
-            }
+//             }
            
 
-        }
-    }
-}
+//         }
+//     }
+// }
 
 
-        stage('Deploy') {
+        stage('Deploy to k8s cluster in pods') {
             steps {
                 script{
                     withAWS(region: 'us-east-1', credentials: "aws-creds") {
