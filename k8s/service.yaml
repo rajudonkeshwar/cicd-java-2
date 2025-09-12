@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: serv-nginx
+spec:
+  selector: # labels are used as selectors
+        app: nginx
+        tier: frontend
+        purpose: deployment
+  ports:
+  - protocol: TCP
+    port: 80 # service port
+    targetPort: 80

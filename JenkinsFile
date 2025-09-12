@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+
+        environment { 
+        REGION = "us-east-1"
+    }
+
     stages {
     stage('Checkout Code') {
         steps {
@@ -151,6 +156,25 @@ stage('Deploying image to docker container'){
         }
     }
 }
+
+
+        stage('Deploy') {
+            steps {
+                script{
+                    withAWS(region: 'us-east-1', credentials: "aws-creds") {
+                        sh """
+                            aws eks update-kubeconfig --region $REGION --name expense
+                            kubectl get nodes
+                            cd helm
+                            sed -i 's/image-version/${BUILD_NUMBER}/g' deployment.yaml
+                            kubectl apply -f deployment.yaml
+                            kubectl apply -f service.yaml
+                            
+                        """
+                    }
+                }
+            }
+        }
 
 
 
