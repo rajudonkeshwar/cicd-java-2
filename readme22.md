@@ -76,3 +76,14 @@ stage('Deploy to Nexus') {
         sh 'mvn clean deploy -s /path/to/settings.xml'
     }
 }
+
+
+
+Plugins:
+* Pipeline stage view
+* Pipeline Utility Steps
+* AWS Credentials
+* AWS Steps
+* Rebuild
+* Ansi Color
+* SonarScanner
