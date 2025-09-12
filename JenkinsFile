@@ -89,7 +89,7 @@ pipeline {
     stage('Deploy to Nexus') {
     steps{
         script{
-            withCredentials([usernamePassword(credentialsId: 'nexus',
+            withCredentials([usernamePassword(credentialsId: 'naxus',
             usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
                 sh 'mvn clean deploy -s settings.xml'
         }
