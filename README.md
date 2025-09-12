@@ -30,14 +30,14 @@ The above maven target stroes the artifacts to the `target` directory. You can e
 # I have taken instance type as t2.large and i attched volume 50gb
 
 ## After the server was configured initially i installed jenkins using below commands
-      "sudo yum install wget ",
-      "sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo",
-      "sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key",	    
-      "sudo yum upgrade -y",
-      "sudo dnf install java-17-amazon-corretto -y",	  
-      "sudo yum install jenkins -y",
- 	    "sudo systemctl start jenkins",
-      "sudo systemctl enable jenkins",
+      sudo yum install wget
+      sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+      sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key	    
+      sudo yum upgrade -y
+      sudo dnf install java-17-amazon-corretto -y	  
+      sudo yum install jenkins -y
+ 	  sudo systemctl start jenkins
+      sudo systemctl enable jenkins
 
 
 ## Then install docker using below commands
@@ -45,7 +45,7 @@ The above maven target stroes the artifacts to the `target` directory. You can e
       sudo yum install -y docker
       sudo service docker start
       sudo usermod -aG docker ec2-user
-      sudo usermod -a -G docker jenkins
+      sudo usermod -aG docker jenkins
 
 
 
@@ -221,7 +221,7 @@ The above maven target stroes the artifacts to the `target` directory. You can e
 ## Install the trivy to scan the image in jenkins server:
 
 
-            "sudo rpm -ivh https://github.com/aquasecurity/trivy/releases/download/v0.18.3/trivy_0.18.3_Linux-64bit.rpm",
+            sudo rpm -ivh https://github.com/aquasecurity/trivy/releases/download/v0.18.3/trivy_0.18.3_Linux-64bit.rpm
 
 
             stage('docker image scan'){
@@ -266,7 +266,7 @@ The above maven target stroes the artifacts to the `target` directory. You can e
                     sh 'docker run -itd --name java-app -p 8000:8080 rajudonkeshwar/java:${BUILD_NUMBER}'
                     }
                 }
-            }   
+            }
 
 
 

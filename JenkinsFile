@@ -22,10 +22,13 @@ pipeline {
     stage('sonar') {
     steps {
         echo 'scanning project'
-        sh 'ls -ltr'
-        sh '''mvn sonar:sonar \\
-              -Dsonar.host.url=http://localhost:9000 \\
-              -Dsonar.login=squ_5c91b17e48383048757232553c18df53661ca07e'''
+        withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_TOKEN')]) {
+            sh """
+            mvn clean verify sonar:sonar \
+            -Dsonar.host.url=http://localhost:9000 \
+            -Dsonar.login=$SONAR_TOKEN
+            """
+        }
     }
 }
 
@@ -86,7 +89,7 @@ pipeline {
     stage('Deploy to Nexus') {
     steps{
         script{
-            withCredentials([usernamePassword(credentialsId: 'nexus-creds',
+            withCredentials([usernamePassword(credentialsId: 'nexus',
             usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
                 sh 'mvn clean deploy -s settings.xml'
         }
@@ -128,11 +131,21 @@ stage('Push image to Hub'){
 stage('Deploying image to docker container'){
     steps{
         script{
-            sh ' docker rm -f java-app '
+
+            if (docker ps -a --filter "name=java-app") {
+             sh ' docker rm -f java-app '
+        }           
             sh 'docker run -itd --name java-app -p 8000:8080 rajudonkeshwar/java1:${BUILD_NUMBER}'
+
         }
     }
 }
+
+
+
+
+
+
 
   }
 }
