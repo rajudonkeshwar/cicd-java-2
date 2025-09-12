@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx
+  name: java-app
   # labels of deployment resource
   labels:
     app: nginx
@@ -32,4 +32,3 @@ spec:
 
 
 
-        

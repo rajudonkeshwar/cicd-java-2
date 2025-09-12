@@ -1,13 +1,15 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: serv-nginx
+  name: java-app
 spec:
+  type: LoadBalancer
   selector: # labels are used as selectors
-        app: nginx
-        tier: frontend
-        purpose: deployment
+    app: nginx
+    tier: frontend
+    purpose: deployment
   ports:
   - protocol: TCP
     port: 80 # service port
     targetPort: 80
+    nodePort: 30008
