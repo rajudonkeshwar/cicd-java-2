@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   name: java-app
 spec:
-  type: nodePort
+  type: NodePort
   selector: # labels are used as selectors
     app: java-app
     tier: frontend
