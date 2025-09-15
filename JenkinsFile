@@ -94,7 +94,7 @@ pipeline {
     stage('Deploy to Nexus') {
     steps{
         script{
-            withCredentials([usernamePassword(credentialsId: 'naxus',
+            withCredentials([usernamePassword(credentialsId: 'nexus',
             usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
                 sh 'mvn clean deploy -s settings.xml'
         }
@@ -108,14 +108,14 @@ pipeline {
     steps{
         script{
             echo 'docker image build'
-            sh ' docker build -t rajudonkeshwar/java1:${BUILD_NUMBER} .'
+            sh ' docker build -t rajudonkeshwar/java2:${BUILD_NUMBER} .'
         }
     }
 }
 		
     stage('docker image scan'){
     steps{
-        sh "trivy image rajudonkeshwar/java1:${BUILD_NUMBER}"
+        sh "trivy image rajudonkeshwar/java2:${BUILD_NUMBER}"
     }
 }		
 
@@ -127,54 +127,53 @@ stage('Push image to Hub'){
             sh 'docker login -u rajudonkeshwar -p ${dockerhub}'
 
       }
-            sh "docker push rajudonkeshwar/java1:${BUILD_NUMBER}"
+            sh "docker push rajudonkeshwar/java2:${BUILD_NUMBER}"
         }
     }
 }
 
 
-// stage('Deploying image to docker container'){
-//     steps{
-//         script{
+stage('Deploying image to docker container'){
+    steps{
+        script{
 
+            def containerExists = sh(
+                script: 'docker ps -a --filter "name=java-app" --format "{{.Names}}"',
+                returnStdout: true
+            ).trim()
 
-//             def containerExists = sh(
-//                 script: 'docker ps -a --filter "name=java-app" --format "{{.Names}}"',
-//                 returnStdout: true
-//             ).trim()
+            if (containerExists) {
+                echo "Container exists: ${containerExists}"
+                 sh ' docker rm -f java-app '
+            } else {
+                echo "No container found with name java-app"
+                sh 'docker run -itd --name java-app -p 8000:8080 rajudonkeshwar/java2:${BUILD_NUMBER}'
 
-//             if (containerExists) {
-//                 echo "Container exists: ${containerExists}"
-//                  sh ' docker rm -f java-app '
-//             } else {
-//                 echo "No container found with name java-app"
-//                 sh 'docker run -itd --name java-app -p 8000:8080 rajudonkeshwar/java1:${BUILD_NUMBER}'
-
-//             }
+            }
            
 
-//         }
-//     }
-// }
-
-
-        stage('Deploy to k8s cluster in pods') {
-            steps {
-                script{
-                    withAWS(region: 'us-east-1', credentials: "aws-creds") {
-                        sh """
-                            aws eks update-kubeconfig --region $REGION --name expense
-                            kubectl get nodes
-                            cd k8s
-                            sed -i 's/image-version/${BUILD_NUMBER}/g' deployment.yaml
-                            kubectl apply -f deployment.yaml
-                            kubectl apply -f service.yaml
-                            
-                        """
-                    }
-                }
-            }
         }
+    }
+}
+
+
+        // stage('Deploy to k8s cluster in pods') {
+        //     steps {
+        //         script{
+        //             withAWS(region: 'us-east-1', credentials: "aws-creds") {
+        //                 sh """
+        //                     aws eks update-kubeconfig --region $REGION --name expense
+        //                     kubectl get nodes
+        //                     cd k8s
+        //                     sed -i 's/image-version/${BUILD_NUMBER}/g' deployment.yaml
+        //                     kubectl apply -f deployment.yaml
+        //                     kubectl apply -f service.yaml
+                            
+        //                 """
+        //             }
+        //         }
+        //     }
+        // }
 
 
 
